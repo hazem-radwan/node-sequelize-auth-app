@@ -3,12 +3,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
-  let { username, email, password, userRoles } = req.body;
+  let { username, email, password, userRoles, balance } = req.body;
   try {
     const user = await User.create({
       password: bcrypt.hashSync(password, 8),
       username,
       email,
+      balance,
     });
     if (!userRoles) {
       await user.setRoles([1]);
@@ -20,7 +21,7 @@ const signup = async (req, res) => {
           },
         },
       });
-      await user.setRoles(roles);
+      await user.setRoles([1, 2, 3]);
     }
     return res.status(201).json({
       message: "user created successfully",

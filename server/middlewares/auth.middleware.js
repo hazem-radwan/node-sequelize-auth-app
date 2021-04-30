@@ -11,7 +11,8 @@ const verifyToken = async (req, res, next) => {
     });
   try {
     let payload = await jwt.verify(token, process.env.JWT_SECRET);
-    req.paload = paylaod;
+    req.payload = payload;
+    console.log(payload);
     next();
   } catch (err) {
     return res.status(500).json({
@@ -23,6 +24,7 @@ const verifyToken = async (req, res, next) => {
 };
 
 const isAuthorizedAs = (roles) => async (req, res, next) => {
+  console.log(roles);
   const { id } = req.payload;
   try {
     const user = await User.findByPk(id);
@@ -33,22 +35,31 @@ const isAuthorizedAs = (roles) => async (req, res, next) => {
         statusCode: 404,
       });
     const userRoles = await user.getRoles();
-    for(let i = 0 ; i < roles.length  ; i ++) { 
-        let isRole = userRoles.map((role) => role.name).includes(role);
-        if (!isRole)
-          return res.status(401).json({
-            status: "UNAUTHORIZED",
-            message: "access denied",
-            statusCode: 401,
-          });
-        return next();
+    console.log(userRoles);
+    for (let i = 0; i < roles.length; i++) {
+      let isRole = userRoles
+        .map((role) => {
+          console.log(role);
+          return role.role;
+        })
+        .includes(roles[i]);
+      if (!isRole)
+        return res.status(401).json({
+          status: "UNAUTHORIZED",
+          message: "access denied",
+          statusCode: 401,
+          userRoles,
+        });
     }
-
+    console.log(id);
+    req.payload = { id };
+    return next();
   } catch (err) {
     return res.status(500).json({
       statusCode: 500,
-      status: "INTERNAL SERVER ERROR",
+      status: "INTERNAL SERVER ERROR | from middleware",
       error: err.message,
+      roles,
     });
   }
 };

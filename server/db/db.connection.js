@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const Order_Product = require("./models/order-product.model");
 const sequelize = new Sequelize(
   process.env.DB, // database name
   process.env.USER, // database username
@@ -25,6 +26,13 @@ const db = {
 db.User = require("./models/user.model")(sequelize, Sequelize);
 db.Role = require("./models/role.model")(sequelize, Sequelize);
 
+db.Order = require("./models/order.model")(sequelize, Sequelize);
+db.Product = require("./models/product.model")(sequelize, Sequelize);
+db.Order_Product = require("./models/order-product.model")(
+  sequelize,
+  Sequelize
+);
+// user : role     M:N
 db.User.belongsToMany(db.Role, {
   // many-to-many relationship
   through: "user_role",
@@ -39,4 +47,15 @@ db.Role.belongsToMany(db.User, {
   otherKey: "userId", // representation of "tergeted-table" Primary-key
 });
 
+// product  order
+
+db.Product.belongsToMany(db.Order, {
+  through: "order_product",
+});
+db.Order.belongsToMany(db.Product, {
+  through: "order_product", // table name only
+});
+
+db.User.hasMany(db.Order);
+db.Order.belongsTo(db.User);
 module.exports = db;
