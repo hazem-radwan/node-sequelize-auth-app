@@ -8,9 +8,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       unique: true,
     },
-  },
-    {
-      freezeTableName: true,
-    });
+  });
   return Role;
 };

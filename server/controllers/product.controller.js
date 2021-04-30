@@ -26,7 +26,6 @@ const createProduct = async (req, res) => {
 };
 const getProductsWithInUserBalance = async (req, res) => {
   const { id } = req.payload;
-  console.log("id from auth request => " , id) ; 
   try {
     const user = await User.findByPk(id) ; 
     const product = await Product.findAll({

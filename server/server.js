@@ -16,21 +16,17 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// db.sequelize.sync({ force: true  , alter : true}).then(() => {
-//   console.log("db is dropped and re-built again ... ");
-//   intitaiteRolesOnConnection();
-// });
+
 db.sequelize
   .query("SET FOREIGN_KEY_CHECKS = 0")
   .then(function () {
     return db.sequelize.sync({ force: true });
+    
   })
-  // .then(function () {
-  //   return db.sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
-  // })
   .then(
     function () {
       console.log("Database synchronised.");
+      intitaiteRolesOnConnection()
     },
     function (err) {
       console.log(err);
@@ -49,14 +45,17 @@ app.listen(PORT, () => {
 });
 
 // functions
-function intitaiteRolesOnConnection() {
-  Role.create({
+async function  intitaiteRolesOnConnection() {
+  await Role.create({
+    id : 1 , 
     role: "user",
   });
-  Role.create({
+  await Role.create({
+    id:2 , 
     role: "moderate",
   });
-  Role.create({
+  await Role.create({
+    id : 3 , 
     role: "admin",
   });
 }

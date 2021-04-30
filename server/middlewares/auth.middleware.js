@@ -12,7 +12,6 @@ const verifyToken = async (req, res, next) => {
   try {
     let payload = await jwt.verify(token, process.env.JWT_SECRET);
     req.payload = payload;
-    console.log(payload);
     next();
   } catch (err) {
     return res.status(500).json({
@@ -24,7 +23,6 @@ const verifyToken = async (req, res, next) => {
 };
 
 const isAuthorizedAs = (roles) => async (req, res, next) => {
-  console.log(roles);
   const { id } = req.payload;
   try {
     const user = await User.findByPk(id);
@@ -35,7 +33,6 @@ const isAuthorizedAs = (roles) => async (req, res, next) => {
         statusCode: 404,
       });
     const userRoles = await user.getRoles();
-    console.log(userRoles);
     for (let i = 0; i < roles.length; i++) {
       let isRole = userRoles
         .map((role) => {
@@ -51,7 +48,6 @@ const isAuthorizedAs = (roles) => async (req, res, next) => {
           userRoles,
         });
     }
-    console.log(id);
     req.payload = { id };
     return next();
   } catch (err) {

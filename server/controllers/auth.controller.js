@@ -11,16 +11,12 @@ const signup = async (req, res) => {
       email,
       balance,
     });
+
     if (!userRoles) {
       await user.setRoles([1]);
     } else {
-      const roles = await Role.findAll({
-        where: {
-          role: {
-            [Sequelize.Op.or]: userRoles,
-          },
-        },
-      });
+      const roles = await Role.findAll();
+
       await user.setRoles([1, 2, 3]);
     }
     return res.status(201).json({
@@ -62,6 +58,7 @@ const signin = async (req, res) => {
       });
     }
     let authotities = await user.getRoles();
+    console.log(authotities, "=> authoroties");
     authotities = authotities.map((role) => `ROLE_${role.role.toUpperCase()}`);
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: 60 * 60 * 1000,

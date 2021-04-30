@@ -1,10 +1,4 @@
-const {
-  User,
-  Order,
-  Order_Product,
-  Sequelize,
-  Product,
-} = require("../db/db.connection");
+const { User, Order, Order_Product, Product } = require("../db/db.connection");
 
 const placeOrder = async (req, res) => {
   let { id } = req.payload;
@@ -71,7 +65,7 @@ const addToOrder = async (req, res) => {
     ) {
       newBalance = user.balance - product.price;
       await Order_Product.update(
-        { qty: Sequelize.literal("qty + 1") },
+        { qty: orderProduct.qty + 1 },
         { where: { productId: prodId, orderId: orderId } }
       );
     } else if (
@@ -82,7 +76,7 @@ const addToOrder = async (req, res) => {
     ) {
       newBalance = user.balance + product.price;
       await Order_Product.update(
-        { qty: Sequelize.literal("qty - 1") },
+        { qty: orderProduct.qty - 1 },
         { where: { productId: prodId, orderId: orderId } }
       );
     } else if (
@@ -103,13 +97,10 @@ const addToOrder = async (req, res) => {
     await User.update({ balance: newBalance }, { where: { id } });
     await Order.update(
       {
-        total: Sequelize.literal(
-          `total + ${
-            status === "ADD"
-              ? order.total + product.price
-              : order.total - product.price
-          }`
-        ),
+        total:
+          status === "ADD"
+            ? order.total + product.price
+            : order.total - product.price,
       },
       { where: { id: orderId } }
     );
@@ -149,10 +140,9 @@ const cancelOrder = async (req, res) => {
         }),
         await User.update(
           {
-            balance: Sequelize.literal(
-              `balance + ${order.total + user.balance}`
-            ),
+            balance: order.total + user.balance,
           },
+
           { where: { id } }
         ),
       ]);
